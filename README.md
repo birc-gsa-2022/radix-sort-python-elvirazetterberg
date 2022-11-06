@@ -1,3 +1,4 @@
+[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=9220725&assignment_repo_type=AssignmentRepo)
 # Radix sorting suffix arrays
 
 In this exercise we will implement radix sorting of all suffixes of a string, with the radix sort going both right-to-left, or least-significant digit (LSD) first, and left-to-right, or most-significant digit (MSD) first. Either approach needs a bucket sort as a sub-component, though, so the first exercise concerns that.
