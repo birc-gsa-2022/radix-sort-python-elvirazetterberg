@@ -165,8 +165,8 @@ def msd_radix_sort(x: str) -> list[int]:
     return
 
 
-def main():
-    # print(list(msd_radix_sort('mississippi')))
+# def main():
+#     # print(list(msd_radix_sort('mississippi')))
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
