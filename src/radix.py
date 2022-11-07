@@ -1,5 +1,5 @@
 """Radix sorting module."""
-
+from collections import OrderedDict, deque
 
 def count_sort(x: str) -> str:
     """Count-sort the string x.
@@ -9,8 +9,22 @@ def count_sort(x: str) -> str:
     >>> count_sort('')
     ''
     """
-    return ""
 
+    count = {}
+    for i in range(len(x)):
+        if x[i] in count:
+            count[x[i]].append(i)
+        else:
+            count[x[i]] = [i] # {'a':[2,3]}
+    
+    output = ''
+    count = OrderedDict(sorted(count.items()))
+    for k, v in count.items():
+        # for i in v:
+        #     print(x[i:])
+        output += k*len(v)    
+
+    return output
 
 def bucket_sort(x: str, idx: list[int]) -> list[int]:
     """Bucket-sort the indices in idx using keys from the string x.
@@ -24,8 +38,35 @@ def bucket_sort(x: str, idx: list[int]) -> list[int]:
     >>> bucket_sort('', [])
     []
     """
-    return []
+    if len(x) != len(idx):
+        return ''
 
+    count = {}
+    for i in idx:
+        if x[i] in count:
+            count[x[i]] += 1
+        else:
+            count[x[i]] = 1 # {'a': 1}
+
+    count = OrderedDict(sorted(count.items()))
+    offsets = {}
+    v_prev = 0
+    for k, v in count.items():
+        offsets[k] = v_prev
+        v_prev += v
+
+    output = [0]*len(idx)
+    for i in idx:
+        key = x[i]
+        output[offsets[key]] = i # change 0 to index according to offset
+        offsets[key] += 1
+
+    return output
+
+def wrapped_idx(x, suf, col):
+    """ Fill conceptual suffix end spaces by rotating x after sentinel """
+
+    return [((i + col)%len(x))+1 for i in suf]
 
 def lsd_radix_sort(x: str) -> list[int]:
     """
@@ -36,8 +77,60 @@ def lsd_radix_sort(x: str) -> list[int]:
     >>> lsd_radix_sort('mississippi')
     [11, 10, 7, 4, 1, 0, 9, 8, 6, 3, 5, 2]
     """
-    return []
+    x += '0'
+    idx_0 = [i for i in range(len(x))]
+    idx = wrapped_idx(x, idx_0, idx_0[-1])
 
+    for i in idx:
+        idx = [(m-1)%len(idx) for m in idx]
+        idx = bucket_sort(x, idx)
+    
+    return idx 
+
+def bucket_sort_msd(x: str, idx: list[int], col: int) -> tuple():
+    """Bucket-sort the indices in idx using keys from the string x."""
+
+    count = {}
+    # loop through suffixes in idx and count the number of each letter in the column col
+    focus_index = [(i+col) if i+col<len(x) else -1 for i in idx]
+    for j in focus_index:
+        if x[j] in count:
+            count[x[j]] += 1
+        else:
+            count[x[j]] = 1 # {'a': 1}
+
+    count = OrderedDict(sorted(count.items())) # lexicographical order
+    offsets = {}
+    v_prev = 0
+    # cumulative sum of counts
+    for k, v in count.items():
+        offsets[k] = v_prev
+        v_prev += v
+
+    output = [0]*len(idx)
+    # loop through idx and place indexes in the correct order in output
+    for i in range(len(idx)):
+        # insert keys according to offsets
+        key = x[focus_index[i]] # get focus key letter
+
+        output[offsets[key]] = idx[i] # output according to suffix
+        offsets[key] += 1
+
+    if output == idx:
+        col += 1
+        # next column
+        return bucket_sort_msd(x, output, col)
+    else:
+        return output, count
+
+def bucket_idx(idx, count):
+    res = []
+    temp_v = 0
+    for v in count.values():
+        res.append(idx[temp_v:temp_v+v])
+        temp_v += v
+
+    return res
 
 def msd_radix_sort(x: str) -> list[int]:
     """
@@ -48,4 +141,32 @@ def msd_radix_sort(x: str) -> list[int]:
     >>> msd_radix_sort('mississippi')
     [11, 10, 7, 4, 1, 0, 9, 8, 6, 3, 5, 2]
     """
-    return []
+
+    stack = deque() # lifo
+    x += '0'
+    curr_idx = [i for i in range(len(x))]
+
+    while curr_idx != []:
+        idx, count = bucket_sort_msd(x, curr_idx, 0)
+        buckets = bucket_idx(idx, count)
+        for b in reversed(buckets):
+            stack.append(b)
+
+        curr_idx = stack.pop()
+        while len(curr_idx) == 1:
+            yield curr_idx[0]
+
+            if len(stack) == 0:
+                curr_idx = []
+                break
+            # go into next bucket
+            curr_idx = stack.pop()
+
+    return
+
+
+def main():
+    # print(list(msd_radix_sort('mississippi')))
+
+if __name__ == '__main__':
+    main()
