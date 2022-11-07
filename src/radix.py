@@ -145,6 +145,7 @@ def msd_radix_sort(x: str) -> list[int]:
     stack = deque() # lifo
     x += '0'
     curr_idx = [i for i in range(len(x))]
+    res = []
 
     while curr_idx != []:
         idx, count = bucket_sort_msd(x, curr_idx, 0)
@@ -154,7 +155,7 @@ def msd_radix_sort(x: str) -> list[int]:
 
         curr_idx = stack.pop()
         while len(curr_idx) == 1:
-            yield curr_idx[0]
+            res.append(curr_idx[0])
 
             if len(stack) == 0:
                 curr_idx = []
@@ -162,7 +163,7 @@ def msd_radix_sort(x: str) -> list[int]:
             # go into next bucket
             curr_idx = stack.pop()
 
-    return
+    return res
 
 
 # def main():
