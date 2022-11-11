@@ -15,7 +15,7 @@ def count_sort(x: str) -> str:
         if x[i] in count:
             count[x[i]].append(i)
         else:
-            count[x[i]] = [i] # {'a':[2,3]}
+            count[x[i]] = [i] # {'a':[2,3]} # should only count, not append.
     
     output = ''
     count = OrderedDict(sorted(count.items()))
@@ -39,7 +39,7 @@ def bucket_sort(x: str, idx: list[int]) -> list[int]:
     []
     """
     if len(x) != len(idx):
-        return ''
+        return []
 
     count = {}
     for i in idx:
@@ -66,7 +66,7 @@ def bucket_sort(x: str, idx: list[int]) -> list[int]:
 def wrapped_idx(x, suf, col):
     """ Fill conceptual suffix end spaces by rotating x after sentinel """
 
-    return [((i + col)%len(x))+1 for i in suf]
+    return [((i + col)%len(x))+1 for i in suf] # why +1?
 
 def lsd_radix_sort(x: str) -> list[int]:
     """
@@ -123,7 +123,7 @@ def bucket_sort_msd(x: str, idx: list[int], col: int) -> tuple():
     else:
         return output, count
 
-def bucket_idx(idx, count):
+def bucket_idx(idx, count): # this uses count from idx[col] which may be why it's incorrect
     res = []
     temp_v = 0
     for v in count.values():
@@ -166,8 +166,11 @@ def msd_radix_sort(x: str) -> list[int]:
     return res
 
 
-# def main():
-#     # print(list(msd_radix_sort('mississippi')))
+def main():
+    x = 'gtgatcctcg'
+    sa = msd_radix_sort(x)
+    for s in sa:
+        print(x[s:])
 
-# if __name__ == '__main__':
-#     main()
+if __name__ == '__main__':
+    main()
