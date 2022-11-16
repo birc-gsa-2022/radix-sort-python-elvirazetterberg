@@ -106,6 +106,7 @@ def bucket_sort_msd(x: str, idx: list[int], col: int) -> tuple():
     for k, v in count.items():
         offsets[k] = v_prev
         v_prev += v
+    # offsets = bucket_idx(focus_index, count)
 
     output = [0]*len(idx)
     # loop through idx and place indexes in the correct order in output
@@ -142,35 +143,48 @@ def msd_radix_sort(x: str) -> list[int]:
     [11, 10, 7, 4, 1, 0, 9, 8, 6, 3, 5, 2]
     """
 
-    stack = deque() # lifo
+    # total = O(n(n+sigma)) for lsd?
+
+    # sorting the first column = O(n+sigma) (sigma from array of size sigma initialized with zeros)
+    # sorting the second column = O(sum_(alpha=1)^sigma(b_alpha+sigma)) where b_alpha is the number 
+    # of elements in a bucket = O(sigma^2+n)
+    # sorting the third column = O(sigma^3+n)
+    # ...
+    # O(sigma^n+n)
+
+    # All a's: O(sigma+n-i)
+
+    # Sorting with big alphabet, how do we sort the alphabet linearly? Not O(sigma log sigma) Number of bytes: 256
+    # Split into bytes and put in by sorting over 4 iterations with radix sort. 32 split into 4 pieces. Unicode. Shifting and masking.
+    # "Lightning fast. Computers love that shit"
+    # 
+
+    # stack = deque() # lifo
     x += '0'
-    curr_idx = [i for i in range(len(x))]
+    stack = [[i for i in range(len(x))]]
     res = []
 
-    while curr_idx != []:
-        idx, count = bucket_sort_msd(x, curr_idx, 0)
+    while stack:
+        curr_idx = stack.pop()
+        if len(curr_idx) == 1:
+            res.append(curr_idx[0])
+            continue
+
+        idx, count = bucket_sort_msd(x, curr_idx, 0) # could use indeces instead of slicing curr_idx
         buckets = bucket_idx(idx, count)
         for b in reversed(buckets):
             stack.append(b)
-
-        curr_idx = stack.pop()
-        while len(curr_idx) == 1:
-            res.append(curr_idx[0])
-
-            if len(stack) == 0:
-                curr_idx = []
-                break
-            # go into next bucket
-            curr_idx = stack.pop()
 
     return res
 
 
 def main():
-    x = 'gtgatcctcg'
+    # x = 'gtgatcctcg'
+    x = 'mississippi'
     sa = msd_radix_sort(x)
-    for s in sa:
-        print(x[s:])
+    print(sa)
+    # for s in sa:
+    #     print(x[s:])
 
 if __name__ == '__main__':
     main()
